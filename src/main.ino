@@ -853,6 +853,9 @@ void handleButtonReturnWifiAction(lv_event_t * e)
 void setup()
 {
     Serial.begin(115200); /* prepare for possible serial debug */
+    Serial.println("");
+
+    delay(1000);
     Serial.println("Squareline Clock init begin!");
 
     esp_err_t err = nvs_flash_init();
