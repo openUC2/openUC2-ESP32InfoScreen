@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "src/ui.h"
+#include "ui/ui.h"
 
 /*********************
  *      DEFINES
