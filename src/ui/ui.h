@@ -32,13 +32,16 @@ extern lv_obj_t *ui_Screen1;
 extern lv_obj_t *ui_TabView1;
 extern lv_obj_t *ui_TabPage1;
 extern lv_obj_t *ui_Button1;
+extern lv_obj_t *ui_Label1;
 extern lv_obj_t *ui_a;
 extern lv_obj_t *ui_TabPage2;
 extern lv_obj_t *ui_Button2;
 extern lv_obj_t *ui_TabPage3;
 extern lv_obj_t *ui_a1;
+extern lv_obj_t *ui_Image1;
 extern lv_obj_t *ui____initial_actions0;
 
+LV_IMG_DECLARE( ui_img_unbenannt_png);   // assets/Unbenannt2.png
 
 
 

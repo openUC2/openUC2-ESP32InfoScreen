@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "*.ino_wifidisplay": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "ui.h": "c",
+        "ui_helpers.h": "c"
     }
 }

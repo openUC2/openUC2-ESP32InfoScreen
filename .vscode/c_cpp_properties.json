@@ -11,6 +11,7 @@
                 "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/include",
                 "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/lib/ESP32_Display_Panel/src",
                 "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/lib/ESP32_IO_Expander/src",
+                "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/.pio/libdeps/esp32s3wavesharedisplay/base64_encode/src",
                 "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/.pio/libdeps/esp32s3wavesharedisplay/ArduinoWebsockets/src",
                 "/Users/bene/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src",
                 "/Users/bene/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
@@ -257,6 +258,7 @@
                     "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/include",
                     "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/lib/ESP32_Display_Panel/src",
                     "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/lib/ESP32_IO_Expander/src",
+                    "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/.pio/libdeps/esp32s3wavesharedisplay/base64_encode/src",
                     "/Users/bene/Dropbox/Dokumente/Promotion/PROJECTS/openUC2-ESP32InfoScreen/.pio/libdeps/esp32s3wavesharedisplay/ArduinoWebsockets/src",
                     "/Users/bene/.platformio/packages/framework-arduinoespressif32/libraries/HTTPClient/src",
                     "/Users/bene/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
@@ -499,7 +501,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=60112",
+                "PLATFORMIO=60113",
                 "BOARD_HAS_PSRAM",
                 "ARDUINO_ESP32_S3_BOX",
                 "ARDUINO_USB_MODE=1",
