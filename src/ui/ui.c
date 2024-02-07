@@ -23,7 +23,7 @@ lv_obj_t *ui_TabPage3;
 lv_obj_t *ui_a1;
 lv_obj_t *ui_Image1;
 lv_obj_t *ui____initial_actions0;
-const lv_img_dsc_t *ui_imgset_unbenannt[1] = {&ui_img_unbenannt_png};
+const lv_img_dsc_t *ui_imgset_unbenannt[1] = {&ui_img_lexin_1_png};
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 

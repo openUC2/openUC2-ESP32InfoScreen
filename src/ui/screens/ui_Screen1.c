@@ -85,9 +85,9 @@ lv_obj_set_style_text_line_space(ui_a1, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_align(ui_a1, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Image1 = lv_img_create(ui_TabPage3);
-lv_img_set_src(ui_Image1, &ui_img_unbenannt_png);
-lv_obj_set_width( ui_Image1, 100);
-lv_obj_set_height( ui_Image1, 100);
+lv_img_set_src(ui_Image1, &ui_img_lexin_1_png);
+lv_obj_set_width( ui_Image1, 215);
+lv_obj_set_height( ui_Image1, 207);
 lv_obj_set_x( ui_Image1, -50 );
 lv_obj_set_y( ui_Image1, 50 );
 lv_obj_set_align( ui_Image1, LV_ALIGN_CENTER );

@@ -41,7 +41,7 @@ extern lv_obj_t *ui_a1;
 extern lv_obj_t *ui_Image1;
 extern lv_obj_t *ui____initial_actions0;
 
-LV_IMG_DECLARE( ui_img_unbenannt_png);   // assets/Unbenannt2.png
+LV_IMG_DECLARE( ui_img_lexin_1_png);   // assets/Unbenannt2.png
 
 
 
