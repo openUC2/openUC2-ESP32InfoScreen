@@ -33,7 +33,7 @@ namespace lvgl_controller
             /*Set the coordinates*/
             data->point.x = point.x;
             data->point.y = point.y;
-            log_i("Touch point: x %d, y %d\n", point.x, point.y);
+            //log_i("Touch point: x %d, y %d\n", point.x, point.y);
         }
     }
 #endif

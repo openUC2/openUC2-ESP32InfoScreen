@@ -13,13 +13,14 @@ namespace uc2ui_wifipage
     // focus event for textareas to trigger the keyboard visibility
     void (*fev)(lv_event_t *ob);
     void (*_scanButtonListner)();
-    void (*_wifiConnectButtonListner)();
+    void (*_wifiConnectButtonListner)(char *, const char *);
+    char * networkid;
 
     void setOnScanButtonClickListner(void scanbuttonListner())
     {
         _scanButtonListner = scanbuttonListner;
     }
-    void setOnWifiConnectButtonClickListner(void wifiConnectButtonListner())
+    void setOnWifiConnectButtonClickListner(void wifiConnectButtonListner(char*,const char*))
     {
         _wifiConnectButtonListner = wifiConnectButtonListner;
     }
@@ -37,8 +38,17 @@ namespace uc2ui_wifipage
         else if (obj == buttonConnect && _wifiConnectButtonListner != nullptr)
         {
             log_i("_wifiConnectButtonListner");
-            _wifiConnectButtonListner();
+            const char * pw = lv_textarea_get_text(wifiPwTextArea);
+            _wifiConnectButtonListner(networkid, pw);
         }
+    }
+
+    void network_item_clicked_cb(lv_event_t *e)
+    {
+        lv_obj_t *obj = lv_event_get_target(e);
+        lv_obj_t *lbl = lv_obj_get_child(obj, NULL);
+        networkid = lv_label_get_text(lbl);
+        log_i("NetworkSSID clicked:%s", networkid);
     }
 
     void init_ui(lv_obj_t *wifiPage, void func(lv_event_t *ob))
@@ -62,6 +72,8 @@ namespace uc2ui_wifipage
         lv_obj_set_height(networksPanel, 221);
         lv_obj_set_x(networksPanel, 3);
         lv_obj_set_y(networksPanel, 87);
+        lv_obj_set_flex_flow(networksPanel, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_flex_align(networksPanel, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
         networksLabel = lv_label_create(wifiPage);
         lv_obj_set_width(networksLabel, LV_SIZE_CONTENT);
@@ -99,20 +111,26 @@ namespace uc2ui_wifipage
         lv_label_set_text(label2, "Connect");
     }
 
-    void addNetworkToPanel(char *network)
+    void clearNetworks()
     {
-        lv_obj_t *label = lv_label_create(networksPanel);
+        lv_obj_clean(networksPanel);
+    }
+
+
+    void addNetworkToPanel(const char *network)
+    {
+        lv_obj_t * button = lv_btn_create(networksPanel);
+        lv_obj_set_width(buttonScan, LV_SIZE_CONTENT);
+        lv_obj_set_height(buttonScan, 30);
+        lv_obj_add_flag(buttonScan, LV_OBJ_FLAG_SCROLL_ON_FOCUS); 
+        lv_obj_clear_flag(buttonScan, LV_OBJ_FLAG_SCROLLABLE);
+
+        lv_obj_t *label = lv_label_create(button);
         lv_obj_set_width(label, LV_SIZE_CONTENT);
         lv_obj_set_height(label, LV_SIZE_CONTENT);
         lv_obj_set_align(label, LV_ALIGN_CENTER);
         lv_label_set_text(label, network);
+        lv_obj_add_event_cb(button,network_item_clicked_cb,LV_EVENT_CLICKED, NULL);
     }
 
-    void addNetworksToPanel(char *networks[], int len)
-    {
-        for (int i = 0; i < len; i++)
-        {
-            addNetworkToPanel(networks[i]);
-        }
-    }
 }
