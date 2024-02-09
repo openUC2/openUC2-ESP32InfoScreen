@@ -21,13 +21,13 @@ namespace uc2ui_controller
             lv_obj_clear_flag(keyboard, LV_OBJ_FLAG_HIDDEN);
             lv_keyboard_set_textarea(keyboard, target);
             lv_obj_update_layout(mainScreen);
-            lv_obj_scroll_to_y(mainScreen, LV_COORD_MAX , LV_ANIM_OFF);
+            lv_obj_scroll_to_y(mainScreen, LV_COORD_MAX , LV_ANIM_ON);
         }
         if (event_code == LV_EVENT_DEFOCUSED)
         {
             lv_obj_add_flag(keyboard, LV_OBJ_FLAG_HIDDEN);
             lv_obj_update_layout(mainScreen);
-            lv_obj_scroll_to_y(mainScreen, LV_COORD_MAX , LV_ANIM_OFF);
+            lv_obj_scroll_to_y(mainScreen, LV_COORD_MAX , LV_ANIM_ON);
         }
     }
 

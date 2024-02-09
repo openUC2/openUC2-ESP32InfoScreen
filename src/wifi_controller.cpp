@@ -18,5 +18,13 @@ namespace wifi_controller
     {
         log_i("Connect to: %s PW:%s", ssid, pw);
         WiFi.begin(ssid, pw);
+        int ret = 0;
+        while (WiFi.status() != WL_CONNECTED && ret < 5)
+        {
+            delay(1000);
+            ret++;
+        }
+        if(ret == 5)
+            WiFi.disconnect();
     }
 }
