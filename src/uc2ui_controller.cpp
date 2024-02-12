@@ -1,6 +1,7 @@
 #include "uc2ui_controller.h"
 #include "uc2ui_wifipage.h"
 #include "Arduino.h"
+#include "uc2ui_controlpage.h"
 
 namespace uc2ui_controller
 {
@@ -56,11 +57,10 @@ namespace uc2ui_controller
         lv_obj_add_flag(keyboard, LV_OBJ_FLAG_HIDDEN);
 
         wifiPage = lv_tabview_add_tab(ui_MainTabView, "Wifi");
-        // create hidden keyboard attached to screen1
-        
         uc2ui_wifipage::init_ui(wifiPage, on_textarea_focus_event);
 
         controlPage = lv_tabview_add_tab(ui_MainTabView, "Control");
+        uc2ui_controlpage::uiInit(controlPage,on_textarea_focus_event);
 
         lv_disp_load_scr(mainScreen);
     }

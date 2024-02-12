@@ -3,6 +3,8 @@
 #include "lvgl_controller.h"
 #include "wifi_controller.h"
 #include "uc2ui_wifipage.h"
+#include "uc2ui_controlpage.h"
+#include "RestApi.h"
 
 void setup()
 {
@@ -18,12 +20,13 @@ void setup()
   }
 
   lvgl_controller::initlgvl();
+
   uc2ui_wifipage::setOnScanButtonClickListner(wifi_controller::scanForNetworks);
   uc2ui_wifipage::setOnWifiConnectButtonClickListner(wifi_controller::connectToNetwork);
+
+  uc2ui_controlpage::setColorChangedListner(RestApi::websocket_updateColors);
+  uc2ui_controlpage::setConnectToHostListner(RestApi::connectTo);
 }
-
-
-
 
 void loop()
 {

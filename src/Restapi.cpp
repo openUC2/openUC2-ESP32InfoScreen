@@ -12,12 +12,40 @@ namespace RestApi
     WebsocketsClient client;
     bool socketConnected = false;
 
-    void connectTo(String url)
+
+    void sendPostRequest(const String &endpoint, const JsonDocument &jsonDoc)
     {
-        _url = url;
-        getModules();
-        getMotor();
-        getLed();
+        HTTPClient http;
+        http.begin(_url + endpoint);
+        http.addHeader("Content-Type", "application/json");
+
+        String payload;
+        serializeJson(jsonDoc, payload);
+
+        int httpResponseCode = http.POST(payload);
+        log_i("Sending POST to %s%s", _url, endpoint);
+        http.end();
+    }
+
+    void sendGetRequest(String endpoint, JsonDocument &doc)
+    {
+        HTTPClient http;
+        http.begin(_url + endpoint);
+        http.addHeader("Content-Type", "application/json");
+
+        int httpResponseCode = http.GET();
+        if (httpResponseCode > 0)
+        {
+            String response = http.getString();
+            deserializeJson(doc, response);
+        }
+        else
+        {
+            Serial.print("Error on sending POST: ");
+            Serial.println(httpResponseCode);
+        }
+        log_i("Sending POST to %s%s", _url, endpoint);
+        http.end();
     }
 
     void getModules()
@@ -63,40 +91,16 @@ namespace RestApi
         doc.clear();
     }
 
-    void sendPostRequest(const String &endpoint, const JsonDocument &jsonDoc)
+
+     void connectTo(String url)
     {
-        HTTPClient http;
-        http.begin(_url + endpoint);
-        http.addHeader("Content-Type", "application/json");
-
-        String payload;
-        serializeJson(jsonDoc, payload);
-
-        int httpResponseCode = http.POST(payload);
-        log_i("Sending POST to %s%s", _url, endpoint);
-        http.end();
+        _url = url;
+        getModules();
+        getMotor();
+        getLed();
     }
 
-    void sendGetRequest(String endpoint, JsonDocument &doc)
-    {
-        HTTPClient http;
-        http.begin(_url + endpoint);
-        http.addHeader("Content-Type", "application/json");
-
-        int httpResponseCode = http.GET();
-        if (httpResponseCode > 0)
-        {
-            String response = http.getString();
-            deserializeJson(doc, response);
-        }
-        else
-        {
-            Serial.print("Error on sending POST: ");
-            Serial.println(httpResponseCode);
-        }
-        log_i("Sending POST to %s%s", _url, endpoint);
-        http.end();
-    }
+    
 
     void onEventsCallback(WebsocketsEvent event, String data)
     {
@@ -151,7 +155,8 @@ namespace RestApi
             log_e("socket connection to %s failed!", _url);
     }
 
-    void send_websocket_msg(JsonDocument doc)
+    
+    void send_websocket_msg(JsonDocument &doc)
     {
         if (socketConnected)
         {
@@ -160,4 +165,34 @@ namespace RestApi
             client.stream(payload);
         }
     }
+
+    //{ led: { LEDArrMode: 1, led_array: [{ id: 0, b: bluec, r: redc, g: greenc }] } }
+    void websocket_updateColors(int r, int g, int b)
+    {
+        DynamicJsonDocument doc(512);
+        doc["led"]["LEDArrMode"] = 1;
+        doc["led"]["led_array"][0]["id"] = 0;
+        doc["led"]["led_array"][0]["r"] = r;
+        doc["led"]["led_array"][0]["g"] = g;
+        doc["led"]["led_array"][0]["b"] = b;
+        send_websocket_msg(doc);
+        doc.clear();
+    }
+
+    int speeds[] = {-160000, -80000, -8000, -4000, -2000, -1000, -500, -200, -100, -50, -20, -10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 4000, 8000, 80000, 160000};
+
+//{ stepperid: 0, speed: a, isforever: af },
+    void driveMotorForever(int motor, int speed)
+    {
+        DynamicJsonDocument doc(512);
+        doc["motor"]["steppers"][0]["stepperid"] = motor;
+        doc["motor"]["steppers"][0]["speed"] = speeds[speed];
+        if(speeds[speed] == 0)
+            doc["motor"]["steppers"][0]["isforever"] = 0;
+        else
+            doc["motor"]["steppers"][0]["isforever"] = 1;
+        send_websocket_msg(doc);
+        doc.clear();
+    }
+
 }
