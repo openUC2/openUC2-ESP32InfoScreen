@@ -55,6 +55,7 @@ namespace RestApi
     {
         DynamicJsonDocument doc(1024);
         sendGetRequest("/modules_get", doc);
+        serializeJsonPretty(doc, Serial);
         if (doc["modules"].containsKey("motor"))
             uc2ui_controlpage::setMotorModule(true);
         if (doc["modules"].containsKey("led"))
@@ -105,8 +106,6 @@ namespace RestApi
             log_i("[WSc] Disconnected!\n");
             socketConnected = false;
             client.disconnect();
-            uc2ui_controlpage::setMotorModule(false);
-            uc2ui_controlpage::setLedModule(false);
             uc2ui_controlpage::showConnect(true);
             break;
         case WStype_CONNECTED:
@@ -127,6 +126,8 @@ namespace RestApi
             // webSocket.sendBIN(payload, length);
             break;
         case WStype_ERROR:
+            uc2ui_controlpage::showConnect(true);
+            break;
         case WStype_FRAGMENT_TEXT_START:
         case WStype_FRAGMENT_BIN_START:
         case WStype_FRAGMENT:

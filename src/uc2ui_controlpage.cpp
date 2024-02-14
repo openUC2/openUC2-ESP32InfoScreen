@@ -121,8 +121,19 @@ namespace uc2ui_controlpage
 
     void showConnect(bool show)
     {
-        setVisibility(ButtonConnectToHost,show);
-        setVisibility(TextAreaURL,show);
+        setVisibility(ButtonConnectToHost, show);
+        setVisibility(TextAreaURL, show);
+        if (show)
+        {
+            setVisibility(motorPanel, false);
+            setVisibility(ledPanel, false);
+        }
+        else
+        {
+            setVisibility(motorPanel, motor_module);
+            setVisibility(ledPanel, led_module);
+        }
+        log_i("show modules motor:%i, led:%i", motor_module, led_module);
     }
 
     void setLedOn(bool on)
@@ -176,9 +187,9 @@ namespace uc2ui_controlpage
             if (updateMotorSpeedListner != nullptr)
                 updateMotorSpeedListner(motor, speed);
         }
-        if(event_code == LV_EVENT_RELEASED)
+        if (event_code == LV_EVENT_RELEASED)
         {
-            lv_slider_set_value(target,17,LV_ANIM_OFF);
+            lv_slider_set_value(target, 17, LV_ANIM_OFF);
             if (updateMotorSpeedListner != nullptr)
                 updateMotorSpeedListner(motor, 17);
         }
@@ -226,9 +237,9 @@ namespace uc2ui_controlpage
             int r = lv_slider_get_value(SliderRed);
             int g = lv_slider_get_value(SliderGreen);
             int b = lv_slider_get_value(SliderBlue);
-            bool state = lv_obj_get_state(obj)& LV_STATE_CHECKED;
-            if(enableLedListner != nullptr)
-                enableLedListner(state, r,g,b);
+            bool state = lv_obj_get_state(obj) & LV_STATE_CHECKED;
+            if (enableLedListner != nullptr)
+                enableLedListner(state, r, g, b);
         }
     }
 
