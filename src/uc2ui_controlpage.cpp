@@ -170,6 +170,12 @@ namespace uc2ui_controlpage
             if (updateMotorSpeedListner != nullptr)
                 updateMotorSpeedListner(motor, speed);
         }
+        if(event_code == LV_EVENT_RELEASED)
+        {
+            lv_slider_set_value(target,17,LV_ANIM_OFF);
+            if (updateMotorSpeedListner != nullptr)
+                updateMotorSpeedListner(motor, 17);
+        }
     }
 
     void onMotorAchanged(lv_event_t *e)
