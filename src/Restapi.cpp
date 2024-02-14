@@ -2,16 +2,20 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include "uc2ui_controlpage.h"
-#include <ArduinoWebsockets.h>
+#include <WebSocketsClient.h>
 
 namespace RestApi
 {
     static String _url;
     uint16_t websocket_server_port = 80;
-    using namespace websockets;
-    WebsocketsClient client;
+    static WebSocketsClient client;
     bool socketConnected = false;
 
+    void loop()
+    {
+        client.loop();
+        delay(1);
+    }
 
     void sendPostRequest(const String &endpoint, const JsonDocument &jsonDoc)
     {
@@ -83,7 +87,7 @@ namespace RestApi
     void getLed()
     {
         DynamicJsonDocument doc(512);
-        sendGetRequest("/led_get", doc);
+        sendGetRequest("/ledarr_get", doc);
         if (doc["ledArrNum"] != NULL)
             uc2ui_controlpage::setLedCount(doc["ledArrNum"]);
         if (doc["led_ison"] != NULL)
@@ -91,49 +95,37 @@ namespace RestApi
         doc.clear();
     }
 
-
-     void connectTo(String url)
+    void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
     {
-        _url = url;
-        getModules();
-        getMotor();
-        getLed();
-    }
 
-    
-
-    void onEventsCallback(WebsocketsEvent event, String data)
-    {
-        if (event == WebsocketsEvent::ConnectionOpened)
+        switch (type)
         {
-            Serial.println("Connection Opened");
-            socketConnected = true;
-        }
-        else if (event == WebsocketsEvent::ConnectionClosed)
-        {
-            Serial.println("Connection Closed");
+        case WStype_DISCONNECTED:
+            log_i("[WSc] Disconnected!\n");
             socketConnected = false;
-        }
-    }
+            break;
+        case WStype_CONNECTED:
+            log_i("[WSc] Connected to url: %s\n", payload);
+            socketConnected = true;
+            break;
+        case WStype_TEXT:
+            log_i("[WSc] get text: %s\n", payload);
 
-    void onMessageCallback(WebsocketsMessage message)
-    {
-        String data = message.data();
-        int index = data.indexOf("=");
-        if (index != -1)
-        {
-            String key = data.substring(0, index);
-            String value = data.substring(index + 1);
+            // send message to server
+            // webSocket.sendTXT("message here");
+            break;
+        case WStype_BIN:
+            log_i("[WSc] get binary length: %u\n", length);
 
-            if (key == "MOVE_FOCUS")
-            {
-                Serial.println("Moving focus");
-            }
-
-            Serial.print("Key: ");
-            Serial.println(key);
-            Serial.print("Value: ");
-            Serial.println(value);
+            // send data to server
+            // webSocket.sendBIN(payload, length);
+            break;
+        case WStype_ERROR:
+        case WStype_FRAGMENT_TEXT_START:
+        case WStype_FRAGMENT_BIN_START:
+        case WStype_FRAGMENT:
+        case WStype_FRAGMENT_FIN:
+            break;
         }
     }
 
@@ -141,34 +133,31 @@ namespace RestApi
     {
         if (socketConnected)
             return;
-
+        log_i("connect to websocket");
         // register callbacks and start the websocket client for frame transfer
-        client.onMessage(onMessageCallback);
-        client.onEvent(onEventsCallback);
+        
         int nConnectionTrial = 0;
-        while (!client.connect(_url, websocket_server_port, "/ws") && nConnectionTrial < 10)
-        {
-            nConnectionTrial++;
-            delay(500);
-        }
-        if(nConnectionTrial == 10)
-            log_e("socket connection to %s failed!", _url);
+        String s = _url;
+        s.replace("http://", "");
+        client.begin(s, websocket_server_port, "/ws");
+        client.onEvent(webSocketEvent);
+        client.setReconnectInterval(5000);
     }
 
-    
     void send_websocket_msg(JsonDocument &doc)
     {
         if (socketConnected)
         {
             String payload;
             serializeJson(doc, payload);
-            client.stream(payload);
+            client.sendTXT(payload);
         }
     }
 
     //{ led: { LEDArrMode: 1, led_array: [{ id: 0, b: bluec, r: redc, g: greenc }] } }
     void websocket_updateColors(int r, int g, int b)
     {
+        log_i("websocket_updateColors");
         DynamicJsonDocument doc(512);
         doc["led"]["LEDArrMode"] = 1;
         doc["led"]["led_array"][0]["id"] = 0;
@@ -181,18 +170,28 @@ namespace RestApi
 
     int speeds[] = {-160000, -80000, -8000, -4000, -2000, -1000, -500, -200, -100, -50, -20, -10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 4000, 8000, 80000, 160000};
 
-//{ stepperid: 0, speed: a, isforever: af },
+    //{ stepperid: 0, speed: a, isforever: af },
     void driveMotorForever(int motor, int speed)
     {
+        log_i("drive motor %i", motor);
         DynamicJsonDocument doc(512);
         doc["motor"]["steppers"][0]["stepperid"] = motor;
         doc["motor"]["steppers"][0]["speed"] = speeds[speed];
-        if(speeds[speed] == 0)
+        if (speeds[speed] == 0)
             doc["motor"]["steppers"][0]["isforever"] = 0;
         else
             doc["motor"]["steppers"][0]["isforever"] = 1;
         send_websocket_msg(doc);
         doc.clear();
+    }
+
+    void connectTo(String url)
+    {
+        _url = url;
+        getModules();
+        getMotor();
+        getLed();
+        websocket_connect();
     }
 
 }

@@ -26,9 +26,11 @@ void setup()
 
   uc2ui_controlpage::setColorChangedListner(RestApi::websocket_updateColors);
   uc2ui_controlpage::setConnectToHostListner(RestApi::connectTo);
+  uc2ui_controlpage::setUpdateMotorSpeedListner(RestApi::driveMotorForever);
 }
 
 void loop()
 {
+  RestApi::loop();
   delay(5);
 }

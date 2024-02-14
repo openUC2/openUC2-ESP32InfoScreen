@@ -15,4 +15,5 @@ namespace uc2ui_controlpage
     void uiInit(lv_obj_t * controlPage,void func(lv_event_t *ob));
     void setColorChangedListner(void colorchangedlistner(int r, int g, int b));
     void setConnectToHostListner(void contoHst(String s));
+    void setUpdateMotorSpeedListner(void updateMotorSpeed(int motor, int speed));
 };

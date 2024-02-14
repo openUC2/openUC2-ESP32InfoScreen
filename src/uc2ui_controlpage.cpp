@@ -115,6 +115,10 @@ namespace uc2ui_controlpage
     void setLedOn(bool on)
     {
         led_on = on;
+        if(on)
+            lv_obj_add_state(LedOnCheckBox, LV_STATE_CHECKED);
+        else
+            lv_obj_clear_state(LedOnCheckBox, LV_STATE_CHECKED);
     }
 
     void setLedCount(int count)
@@ -408,6 +412,7 @@ namespace uc2ui_controlpage
         lv_textarea_set_placeholder_text(TextAreaURL, "URL...");
         lv_textarea_set_one_line(TextAreaURL, true);
         lv_obj_add_event_cb(TextAreaURL, fev, LV_EVENT_ALL, NULL);
+        lv_textarea_set_text(TextAreaURL, "192.168.4.1");
 
         ButtonConnectToHost = lv_btn_create(container2);
         lv_obj_set_width(ButtonConnectToHost, 100);
@@ -417,6 +422,8 @@ namespace uc2ui_controlpage
         lv_obj_set_align(ButtonConnectToHost, LV_ALIGN_TOP_MID);
         lv_obj_add_flag(ButtonConnectToHost, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_clear_flag(ButtonConnectToHost, LV_OBJ_FLAG_SCROLLABLE);
+
+        lv_obj_add_event_cb(ButtonConnectToHost, button_event_cb, LV_EVENT_CLICKED, NULL);
 
         LabelConnectToHost = lv_label_create(ButtonConnectToHost);
         lv_obj_set_width(LabelConnectToHost, LV_SIZE_CONTENT);
@@ -441,7 +448,7 @@ namespace uc2ui_controlpage
         lv_obj_set_x(motorPanel, -299);
         lv_obj_set_y(motorPanel, -19);
         lv_obj_clear_flag(motorPanel, LV_OBJ_FLAG_SCROLLABLE);
-        // setVisibility(motorPanel, false);
+        setVisibility(motorPanel, false);
 
         initMotorPanel();
 
@@ -451,7 +458,7 @@ namespace uc2ui_controlpage
         lv_obj_set_x(ledPanel, 137);
         lv_obj_set_y(ledPanel, 59);
         lv_obj_clear_flag(ledPanel, LV_OBJ_FLAG_SCROLLABLE);
-        // setVisibility(ledPanel, false);
+        setVisibility(ledPanel, false);
 
         initLedPanel();
     }

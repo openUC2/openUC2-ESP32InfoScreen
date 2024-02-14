@@ -18,6 +18,7 @@ namespace wifi_controller
     {
         log_i("Connect to: %s PW:%s", ssid, pw);
         WiFi.begin(ssid, pw);
+        WiFi.setAutoReconnect(false);
         int ret = 0;
         while (WiFi.status() != WL_CONNECTED && ret < 5)
         {
