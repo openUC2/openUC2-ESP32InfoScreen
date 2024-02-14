@@ -16,4 +16,5 @@ namespace uc2ui_controlpage
     void setColorChangedListner(void colorchangedlistner(int r, int g, int b));
     void setConnectToHostListner(void contoHst(String s));
     void setUpdateMotorSpeedListner(void updateMotorSpeed(int motor, int speed));
+    void setenableLedListner(void ledlistner(bool enable,int r, int g, int b));
 };

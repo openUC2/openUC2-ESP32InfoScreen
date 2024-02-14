@@ -46,6 +46,13 @@ namespace uc2ui_controlpage
         updatedColorsListner = colorchangedlistner;
     }
 
+    void (*enableLedListner)(bool enable, int r, int g, int b);
+
+    void setenableLedListner(void ledlistner(bool enable, int r, int g, int b))
+    {
+        enableLedListner = ledlistner;
+    }
+
     void (*updateMotorSpeedListner)(int motor, int speed);
 
     void setUpdateMotorSpeedListner(void updateMotorSpeed(int motor, int speed))
@@ -115,7 +122,7 @@ namespace uc2ui_controlpage
     void setLedOn(bool on)
     {
         led_on = on;
-        if(on)
+        if (on)
             lv_obj_add_state(LedOnCheckBox, LV_STATE_CHECKED);
         else
             lv_obj_clear_state(LedOnCheckBox, LV_STATE_CHECKED);
@@ -195,6 +202,21 @@ namespace uc2ui_controlpage
             str += s;
             log_i("Conntect to Host:%s", str.c_str());
             connectToHost(str);
+        }
+    }
+
+    void ledCheckBox_event_handler(lv_event_t *e)
+    {
+        lv_event_code_t code = lv_event_get_code(e);
+        lv_obj_t *obj = lv_event_get_target(e);
+        if (code == LV_EVENT_VALUE_CHANGED)
+        {
+            int r = lv_slider_get_value(SliderRed);
+            int g = lv_slider_get_value(SliderGreen);
+            int b = lv_slider_get_value(SliderBlue);
+            bool state = lv_obj_get_state(obj)& LV_STATE_CHECKED;
+            if(enableLedListner != nullptr)
+                enableLedListner(state, r,g,b);
         }
     }
 
@@ -386,6 +408,7 @@ namespace uc2ui_controlpage
         lv_obj_add_event_cb(SliderRed, onColorSliderChanged, LV_EVENT_ALL, NULL);
         lv_obj_add_event_cb(SliderGreen, onColorSliderChanged, LV_EVENT_ALL, NULL);
         lv_obj_add_event_cb(SliderBlue, onColorSliderChanged, LV_EVENT_ALL, NULL);
+        lv_obj_add_event_cb(LedOnCheckBox, ledCheckBox_event_handler, LV_EVENT_ALL, NULL);
     }
 
     void uiInit(lv_obj_t *controlPage, void func(lv_event_t *ob))

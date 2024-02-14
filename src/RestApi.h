@@ -6,4 +6,5 @@ namespace RestApi
     void websocket_updateColors(int r, int g, int b);
     void driveMotorForever(int motor, int speed);
     void loop();
+    void setLedOn(bool enable,int r,int g,int b);
 };

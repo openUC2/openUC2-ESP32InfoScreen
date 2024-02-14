@@ -9,6 +9,7 @@ namespace RestApi
     static String _url;
     uint16_t websocket_server_port = 80;
     static WebSocketsClient client;
+    static HTTPClient http;
     bool socketConnected = false;
 
     void loop()
@@ -19,7 +20,6 @@ namespace RestApi
 
     void sendPostRequest(const String &endpoint, const JsonDocument &jsonDoc)
     {
-        HTTPClient http;
         http.begin(_url + endpoint);
         http.addHeader("Content-Type", "application/json");
 
@@ -33,7 +33,6 @@ namespace RestApi
 
     void sendGetRequest(String endpoint, JsonDocument &doc)
     {
-        HTTPClient http;
         http.begin(_url + endpoint);
         http.addHeader("Content-Type", "application/json");
 
@@ -94,6 +93,8 @@ namespace RestApi
             uc2ui_controlpage::setLedOn(doc["led_ison"]);
         doc.clear();
     }
+
+    
 
     void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
     {
@@ -165,6 +166,19 @@ namespace RestApi
         doc["led"]["led_array"][0]["g"] = g;
         doc["led"]["led_array"][0]["b"] = b;
         send_websocket_msg(doc);
+        doc.clear();
+    }
+
+    void setLedOn(bool enable,int r,int g,int b)
+    {
+        DynamicJsonDocument doc(512);
+        doc["led"]["LEDArrMode"] = enable ? 1 : 3;
+        doc["led"]["led_array"][0]["id"] = 0;
+        doc["led"]["led_array"][0]["r"] = r;
+        doc["led"]["led_array"][0]["g"] = g;
+        doc["led"]["led_array"][0]["b"] = b;
+        send_websocket_msg(doc);
+        //sendPostRequest("/ledarr_act", doc);
         doc.clear();
     }
 
