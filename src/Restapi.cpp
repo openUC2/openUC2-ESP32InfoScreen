@@ -104,10 +104,15 @@ namespace RestApi
         case WStype_DISCONNECTED:
             log_i("[WSc] Disconnected!\n");
             socketConnected = false;
+            client.disconnect();
+            uc2ui_controlpage::setMotorModule(false);
+            uc2ui_controlpage::setLedModule(false);
+            uc2ui_controlpage::showConnect(true);
             break;
         case WStype_CONNECTED:
             log_i("[WSc] Connected to url: %s\n", payload);
             socketConnected = true;
+            uc2ui_controlpage::showConnect(false);
             break;
         case WStype_TEXT:
             log_i("[WSc] get text: %s\n", payload);

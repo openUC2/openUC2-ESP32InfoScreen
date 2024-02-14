@@ -33,5 +33,6 @@ void setup()
 void loop()
 {
   RestApi::loop();
+  wifi_controller::loop();
   delay(5);
 }

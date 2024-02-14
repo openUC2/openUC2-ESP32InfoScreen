@@ -119,6 +119,12 @@ namespace uc2ui_controlpage
         setVisibility(LabelA, enable);
     }
 
+    void showConnect(bool show)
+    {
+        setVisibility(ButtonConnectToHost,show);
+        setVisibility(TextAreaURL,show);
+    }
+
     void setLedOn(bool on)
     {
         led_on = on;

@@ -8,4 +8,5 @@ namespace uc2ui_wifipage
     void clearNetworks();
     void setOnScanButtonClickListner(void scanbuttonListner());
     void setOnWifiConnectButtonClickListner(void wifiConnectButtonListner(char*,const char*));
+    void updatedWifiLed(int lv_pallet_color);
 };
