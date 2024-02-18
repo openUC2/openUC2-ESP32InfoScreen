@@ -2,6 +2,7 @@
 #include "uc2ui_wifipage.h"
 #include "Arduino.h"
 #include "uc2ui_controlpage.h"
+#include "uc2ui_motoradvpage.h"
 
 namespace uc2ui_controller
 {
@@ -11,6 +12,7 @@ namespace uc2ui_controller
 
     lv_obj_t *wifiPage;
     lv_obj_t *controlPage;
+    lv_obj_t *motorAdvPage;
 
     void on_textarea_focus_event(lv_event_t *e)
     {
@@ -48,7 +50,7 @@ namespace uc2ui_controller
         lv_obj_set_width(ui_MainTabView, lv_pct(100));
         lv_obj_set_height(ui_MainTabView, lv_pct(100));
         lv_obj_set_align(ui_MainTabView, LV_ALIGN_CENTER);
-        lv_obj_clear_flag(ui_MainTabView, LV_OBJ_FLAG_SCROLLABLE); /// Flags
+        lv_obj_clear_flag(lv_tabview_get_content(ui_MainTabView), LV_OBJ_FLAG_SCROLLABLE);
 
         keyboard = lv_keyboard_create(mainScreen);
         lv_obj_set_width(keyboard, 800);
@@ -61,6 +63,9 @@ namespace uc2ui_controller
 
         controlPage = lv_tabview_add_tab(ui_MainTabView, "Control");
         uc2ui_controlpage::uiInit(controlPage,on_textarea_focus_event);
+
+        motorAdvPage = lv_tabview_add_tab(ui_MainTabView, "Motor");
+        uc2ui_motoradvpage::initUi(motorAdvPage);
 
         lv_disp_load_scr(mainScreen);
     }

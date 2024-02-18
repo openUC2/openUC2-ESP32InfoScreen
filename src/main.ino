@@ -5,6 +5,7 @@
 #include "uc2ui_wifipage.h"
 #include "uc2ui_controlpage.h"
 #include "RestApi.h"
+#include "uc2ui_motoradvpage.h"
 
 void setup()
 {
@@ -19,6 +20,7 @@ void setup()
     Serial.println("nvs init err");
   }
 
+  RestApi::init();
   lvgl_controller::initlgvl();
 
   uc2ui_wifipage::setOnScanButtonClickListner(wifi_controller::scanForNetworks);
@@ -28,6 +30,7 @@ void setup()
   uc2ui_controlpage::setConnectToHostListner(RestApi::connectTo);
   uc2ui_controlpage::setUpdateMotorSpeedListner(RestApi::driveMotorForever);
   uc2ui_controlpage::setenableLedListner(RestApi::setLedOn);
+  uc2ui_motoradvpage::setDriveXYMotorListner(RestApi::driveMotorXYForever);
 }
 
 void loop()
