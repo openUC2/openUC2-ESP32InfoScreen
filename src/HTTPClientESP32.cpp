@@ -59,5 +59,6 @@ void HTTPClientESP32::motor_act(int stepperid, int position, int speed, int isab
     log_d("motor_act");
     // Send POST request
     sendPostRequest("motor_act", jsonDoc);
+    jsonDoc.clear();
 
 }
