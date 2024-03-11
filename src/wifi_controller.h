@@ -1,4 +1,5 @@
 #pragma once
+#include "Arduino.h"
 
 namespace wifi_controller
 {
@@ -13,4 +14,6 @@ namespace wifi_controller
     void scanForNetworks();
     void connectToNetwork(char * ssid,const char * pw);
     void loop();
+    void searchForDevices();
+    void connectToDevice(char* url);
 }; // namespace wifi_controller

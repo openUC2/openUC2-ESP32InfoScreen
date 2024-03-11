@@ -207,7 +207,7 @@ namespace RestApi
         doc.clear();
     }
 
-    int speeds[] = {-160000, -80000, -8000, -4000, -2000, -1000, -500, -200, -100, -50, -20, -10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 4000, 8000, 80000, 160000};
+    int speeds[] = {-80000, -40000, -8000, -4000, -2000, -1000, -500, -200, -100, -50, -20, -10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 4000, 8000, 40000, 80000};
 
     void driveMotorForever(JsonDocument &doc, int motor, int speed, int arrid)
     {
@@ -224,6 +224,9 @@ namespace RestApi
     {
         log_i("drive motor %i", motor);
         updateMotorForever_t m;
+        
+        if(uxQueueMessagesWaiting(driveMotorForeverQueue) == QueueElementSize-1)
+            xQueueReceive(driveMotorForeverQueue, (void*)&m, 0);
         m.speed = speeds[speed];
         m.motor = motor;
         int ret = xQueueSend(driveMotorForeverQueue, (void *)&m, 0);
@@ -233,10 +236,11 @@ namespace RestApi
     {
         log_i("drive XY motor speed x:%i speed y:%i", speedX,speedY);
         updateMotorXYForever_t o;
+        
+        if(uxQueueMessagesWaiting(driveMotorXYForeverQueue) == QueueElementSize-1)
+            xQueueReceive(driveMotorXYForeverQueue, (void*)&o, 0);
         o.speedX = speedX;
         o.speedY = speedY;
-        if(uxQueueMessagesWaiting(driveMotorXYForeverQueue) == QueueElementSize-1)
-            xQueueReceive(updateLedColorQueue, (void*)&o, 0);
         int ret = xQueueSend(driveMotorXYForeverQueue, (void *)&o, 0);
     }
 

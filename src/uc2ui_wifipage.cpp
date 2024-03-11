@@ -10,13 +10,24 @@ namespace uc2ui_wifipage
     static lv_obj_t *wifiPwTextArea;
     static lv_obj_t *buttonConnect;
     lv_obj_t *label2;
-    lv_obj_t * statusLabel;
-    lv_obj_t * statusLED;
+    lv_obj_t *statusLabel;
+    lv_obj_t *statusLED;
+    lv_obj_t *devicesPanel;
+    lv_obj_t *devicesLabel;
+    lv_obj_t *devicesButton;
+    lv_obj_t *devicesButtonLabel;
     // focus event for textareas to trigger the keyboard visibility
     void (*fev)(lv_event_t *ob);
     void (*_scanButtonListner)();
+    void (*_searchDeviceButtonListner)();
     void (*_wifiConnectButtonListner)(char *, const char *);
     char *networkid;
+    char*deviceid;
+
+    void setOnSearchDeviceButtonClickListner(void searchDeviceListner())
+    {
+        _searchDeviceButtonListner = searchDeviceListner;
+    }
 
     void setOnScanButtonClickListner(void scanbuttonListner())
     {
@@ -25,6 +36,13 @@ namespace uc2ui_wifipage
     void setOnWifiConnectButtonClickListner(void wifiConnectButtonListner(char *, const char *))
     {
         _wifiConnectButtonListner = wifiConnectButtonListner;
+    }
+
+    void (*connectToHost)(char* s);
+
+    void setConnectToHostListner(void contoHst(char* s))
+    {
+        connectToHost = contoHst;
     }
 
     void button_event_cb(lv_event_t *e)
@@ -43,6 +61,10 @@ namespace uc2ui_wifipage
             const char *pw = lv_textarea_get_text(wifiPwTextArea);
             _wifiConnectButtonListner(networkid, pw);
         }
+        else if(obj == devicesButton && _searchDeviceButtonListner != nullptr)
+        {
+            _searchDeviceButtonListner();
+        }
     }
 
     void network_item_clicked_cb(lv_event_t *e)
@@ -51,6 +73,14 @@ namespace uc2ui_wifipage
         lv_obj_t *lbl = lv_obj_get_child(obj, NULL);
         networkid = lv_label_get_text(lbl);
         log_i("NetworkSSID clicked:%s", networkid);
+    }
+    void device_item_clicked_cb(lv_event_t *e)
+    {
+        lv_obj_t *obj = lv_event_get_target(e);
+        lv_obj_t *lbl = lv_obj_get_child(obj, NULL);
+        deviceid = lv_label_get_text(lbl);
+        connectToHost(deviceid);
+        log_i("DeviceId clicked:%s", deviceid);
     }
 
     void updatedWifiLed(int lv_pallet_color)
@@ -126,12 +156,43 @@ namespace uc2ui_wifipage
         lv_obj_set_align(statusLabel, LV_ALIGN_CENTER);
         lv_label_set_text(statusLabel, "Status:");
 
-        statusLED  = lv_led_create(wifiPage);
+        statusLED = lv_led_create(wifiPage);
         lv_obj_set_x(statusLED, -55);
         lv_obj_set_y(statusLED, -171);
         lv_obj_set_align(statusLED, LV_ALIGN_CENTER);
         lv_led_on(statusLED);
         lv_led_set_color(statusLED, lv_palette_main(LV_PALETTE_RED));
+
+        devicesPanel = lv_obj_create(wifiPage);
+        lv_obj_set_width(devicesPanel, 248);
+        lv_obj_set_height(devicesPanel, 221);
+        lv_obj_set_x(devicesPanel, 511);
+        lv_obj_set_y(devicesPanel, 87);
+        lv_obj_clear_flag(devicesPanel, LV_OBJ_FLAG_SCROLLABLE); /// Flags
+
+        devicesLabel = lv_label_create(wifiPage);
+        lv_obj_set_width(devicesLabel, LV_SIZE_CONTENT);  /// 1
+        lv_obj_set_height(devicesLabel, LV_SIZE_CONTENT); /// 1
+        lv_obj_set_x(devicesLabel, 164);
+        lv_obj_set_y(devicesLabel, -124);
+        lv_obj_set_align(devicesLabel, LV_ALIGN_CENTER);
+        lv_label_set_text(devicesLabel, "Devices:");
+
+        devicesButton = lv_btn_create(wifiPage);
+        lv_obj_set_width(devicesButton, 132);
+        lv_obj_set_height(devicesButton, 50);
+        lv_obj_set_x(devicesButton, 203);
+        lv_obj_set_y(devicesButton, -168);
+        lv_obj_set_align(devicesButton, LV_ALIGN_CENTER);
+        lv_obj_add_flag(devicesButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS); /// Flags
+        lv_obj_clear_flag(devicesButton, LV_OBJ_FLAG_SCROLLABLE);    /// Flags
+        lv_obj_add_event_cb(devicesButton, button_event_cb, LV_EVENT_CLICKED, NULL);
+
+        devicesButtonLabel = lv_label_create(devicesButton);
+        lv_obj_set_width(devicesButtonLabel, LV_SIZE_CONTENT);  /// 1
+        lv_obj_set_height(devicesButtonLabel, LV_SIZE_CONTENT); /// 1
+        lv_obj_set_align(devicesButtonLabel, LV_ALIGN_CENTER);
+        lv_label_set_text(devicesButtonLabel, "Search Devices");
     }
 
     void clearNetworks()
@@ -139,20 +200,32 @@ namespace uc2ui_wifipage
         lv_obj_clean(networksPanel);
     }
 
-    void addNetworkToPanel(const char *network)
+    void addButtonToPanel(const char *name, lv_obj_t * panel, void(item_clicked)(lv_event_t * cb))
     {
-        lv_obj_t *button = lv_btn_create(networksPanel);
-        lv_obj_set_width(buttonScan, LV_SIZE_CONTENT);
-        lv_obj_set_height(buttonScan, 30);
-        lv_obj_add_flag(buttonScan, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-        lv_obj_clear_flag(buttonScan, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_t *button = lv_btn_create(panel);
+        lv_obj_set_width(button, LV_SIZE_CONTENT);
+        lv_obj_set_height(button, 30);
+        lv_obj_add_flag(button, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_clear_flag(button, LV_OBJ_FLAG_SCROLLABLE);
 
         lv_obj_t *label = lv_label_create(button);
         lv_obj_set_width(label, LV_SIZE_CONTENT);
         lv_obj_set_height(label, LV_SIZE_CONTENT);
         lv_obj_set_align(label, LV_ALIGN_CENTER);
-        lv_label_set_text(label, network);
-        lv_obj_add_event_cb(button, network_item_clicked_cb, LV_EVENT_CLICKED, NULL);
+        lv_label_set_text(label, name);
+        lv_obj_add_event_cb(button, item_clicked, LV_EVENT_CLICKED, NULL);
     }
+
+    void addNetworkToPanel(const char *network)
+    {
+        addButtonToPanel(network,networksPanel, network_item_clicked_cb);
+    }
+
+    void addDeviceToPanel(const char * device)
+    {
+        addButtonToPanel(device,devicesPanel,device_item_clicked_cb);
+    }
+
+    
 
 }
