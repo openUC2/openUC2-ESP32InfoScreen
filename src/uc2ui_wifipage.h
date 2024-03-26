@@ -1,5 +1,6 @@
 #pragma once
 #include "lvgl.h"
+#include "Arduino.h"
 
 namespace uc2ui_wifipage
 {
@@ -9,4 +10,7 @@ namespace uc2ui_wifipage
     void setOnScanButtonClickListner(void scanbuttonListner());
     void setOnWifiConnectButtonClickListner(void wifiConnectButtonListner(char*,const char*));
     void updatedWifiLed(int lv_pallet_color);
+    void addDeviceToPanel(const char * device);
+    void setOnSearchDeviceButtonClickListner(void searchDeviceListner());
+    void setConnectToHostListner(void contoHst(char * s));
 };
