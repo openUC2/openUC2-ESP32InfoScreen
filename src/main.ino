@@ -31,6 +31,7 @@ void setup()
   uc2ui_controlpage::setConnectToHostListner(RestApi::connectTo);
   uc2ui_controlpage::setUpdateMotorSpeedListner(RestApi::driveMotorForever);
   uc2ui_controlpage::setenableLedListner(RestApi::setLedOn);
+  uc2ui_controlpage::setenableLaserListner(RestApi::setLaserOn);
   uc2ui_motoradvpage::setDriveXYMotorListner(RestApi::driveMotorXYForever);
 }
 

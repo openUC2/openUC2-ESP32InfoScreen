@@ -53,6 +53,13 @@ namespace uc2ui_controlpage
         enableLedListner = ledlistner;
     }
 
+    void (*enableLaserListner)(bool enable, int value);
+
+    void setenableLaserListner(void laserListner(bool enable, int value))
+    {
+        enableLaserListner = laserlistner;
+    }
+
     void (*updateMotorSpeedListner)(int motor, int speed);
 
     void setUpdateMotorSpeedListner(void updateMotorSpeed(int motor, int speed))

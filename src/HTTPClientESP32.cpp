@@ -62,3 +62,14 @@ void HTTPClientESP32::motor_act(int stepperid, int position, int speed, int isab
     jsonDoc.clear();
 
 }
+
+void HTTPClientESP32::laser_act(int laserid, int value){
+    // prepare a JSON payload using ArduinoJson
+    StaticJsonDocument<200> jsonDoc;
+    jsonDoc["laser"]["laserid"] = laserid;
+    jsonDoc["laser"]["value"] = value;
+    log_d("laser_act");
+    // Send POST request
+    sendPostRequest("laser_act", jsonDoc);
+    jsonDoc.clear();
+}
