@@ -3,9 +3,9 @@
 #include "lvgl_controller.h"
 #include "wifi_controller.h"
 #include "uc2ui_wifipage.h"
-#include "uc2ui_controlpage.h"
 #include "RestApi.h"
-#include "uc2ui_motoradvpage.h"
+#include "uc2ui_ledpage.h"
+#include "uc2ui_motorpage.h"
 
 void setup()
 {
