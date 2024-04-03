@@ -90,7 +90,9 @@ namespace lvgl_controller
         /* Using internal SRAM is more fast than PSRAM (Note: Memory allocated using `malloc` may be located in PSRAM.) */
         log_i("create buffer and driver");
         uint8_t *buf = (uint8_t *)heap_caps_calloc(1, LVGL_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_INTERNAL);
+        //uint8_t *buf2 = (uint8_t *)heap_caps_calloc(1, LVGL_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_INTERNAL);
         assert(buf);
+        //assert(buf2);
         lv_disp_draw_buf_init(&draw_buf, buf, NULL, LVGL_BUF_SIZE);
 
         lv_disp_drv_init(&disp_drv);
@@ -130,10 +132,6 @@ namespace lvgl_controller
 
         /* Release the mutex */
         lvgl_port_unlock();
-
-        // Attach event handlers
-        // lv_obj_add_event_cb(ui_Button1, button_event_cb, LV_EVENT_CLICKED, NULL);
-        // lv_obj_add_event_cb(ui_Button2, button_event_cb, LV_EVENT_CLICKED, NULL);
         log_i("initlgvl done");
     }
 }

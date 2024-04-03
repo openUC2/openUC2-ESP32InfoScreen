@@ -199,6 +199,10 @@ namespace uc2ui_wifipage
     {
         lv_obj_clean(networksPanel);
     }
+    void clearDevices()
+    {
+        lv_obj_clean(devicesPanel);
+    }
 
     void addButtonToPanel(const char *name, lv_obj_t * panel, void(item_clicked)(lv_event_t * cb))
     {

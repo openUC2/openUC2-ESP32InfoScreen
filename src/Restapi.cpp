@@ -1,8 +1,11 @@
 #include "RestApi.h"
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include "uc2ui_controlpage.h"
 #include <WebSocketsClient.h>
+#include "uc2ui_ledpage.h"
+#include "uc2ui_motorpage.h"
+#include "uc2ui_controller.h"
+#include "uc2ui_wifipage.h"
 
 namespace RestApi
 {
@@ -78,9 +81,9 @@ namespace RestApi
         sendGetRequest("/modules_get", doc);
         serializeJsonPretty(doc, Serial);
         if (doc["modules"].containsKey("motor"))
-            uc2ui_controlpage::setMotorModule(true);
+            uc2ui_motorpage::setMotorModule(true);
         if (doc["modules"].containsKey("led"))
-            uc2ui_controlpage::setLedModule(true);
+            uc2ui_ledpage::setLedModule(true);
         doc.clear();
     }
 
@@ -93,13 +96,13 @@ namespace RestApi
             if (doc["motor"]["steppers"][i] != NULL)
             {
                 if (doc["motor"]["steppers"][i]["stepperid"] == 0 && doc["motor"]["steppers"][i]["isActivated"]) // A
-                    uc2ui_controlpage::setMotorA(true);
+                    uc2ui_motorpage::setMotorA(true);
                 if (doc["motor"]["steppers"][i]["stepperid"] == 1 && doc["motor"]["steppers"][i]["isActivated"]) // X
-                    uc2ui_controlpage::setMotorX(true);
+                    uc2ui_motorpage::setMotorX(true);
                 if (doc["motor"]["steppers"][i]["stepperid"] == 2 && doc["motor"]["steppers"][i]["isActivated"]) // Y
-                    uc2ui_controlpage::setMotorY(true);
+                    uc2ui_motorpage::setMotorY(true);
                 if (doc["motor"]["steppers"][i]["stepperid"] == 3 && doc["motor"]["steppers"][i]["isActivated"]) // Z
-                    uc2ui_controlpage::setMotorZ(true);
+                    uc2ui_motorpage::setMotorZ(true);
             }
         }
         doc.clear();
@@ -110,10 +113,17 @@ namespace RestApi
         DynamicJsonDocument doc(512);
         sendGetRequest("/ledarr_get", doc);
         if (doc["ledArrNum"] != NULL)
-            uc2ui_controlpage::setLedCount(doc["ledArrNum"]);
+            uc2ui_ledpage::setLedCount(doc["ledArrNum"]);
         if (doc["led_ison"] != NULL)
-            uc2ui_controlpage::setLedOn(doc["led_ison"]);
+            uc2ui_ledpage::setLedOn(doc["led_ison"]);
         doc.clear();
+    }
+
+    void disconnect()
+    {
+        client.disconnect();
+        uc2ui_controller::showMicroscopePage(false);
+        uc2ui_wifipage::clearDevices();
     }
 
     void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
@@ -124,13 +134,12 @@ namespace RestApi
         case WStype_DISCONNECTED:
             log_i("[WSc] Disconnected!\n");
             socketConnected = false;
-            client.disconnect();
-            uc2ui_controlpage::showConnect(true);
+            disconnect();
             break;
         case WStype_CONNECTED:
             log_i("[WSc] Connected to url: %s\n", payload);
             socketConnected = true;
-            uc2ui_controlpage::showConnect(false);
+            uc2ui_controller::showMicroscopePage(true);
             break;
         case WStype_TEXT:
             log_i("[WSc] get text: %s\n", payload);
@@ -145,8 +154,7 @@ namespace RestApi
             // webSocket.sendBIN(payload, length);
             break;
         case WStype_ERROR:
-            uc2ui_controlpage::showConnect(true);
-            client.disconnect();
+            disconnect();
             break;
         case WStype_FRAGMENT_TEXT_START:
         case WStype_FRAGMENT_BIN_START:
@@ -180,8 +188,6 @@ namespace RestApi
             client.sendTXT(payload);
         }
     }
-
-    
 
     //{ led: { LEDArrMode: 1, led_array: [{ id: 0, b: bluec, r: redc, g: greenc }] } }
     void websocket_updateColors(int r, int g, int b)
@@ -224,9 +230,9 @@ namespace RestApi
     {
         log_i("drive motor %i", motor);
         updateMotorForever_t m;
-        
-        if(uxQueueMessagesWaiting(driveMotorForeverQueue) == QueueElementSize-1)
-            xQueueReceive(driveMotorForeverQueue, (void*)&m, 0);
+
+        if (uxQueueMessagesWaiting(driveMotorForeverQueue) == QueueElementSize - 1)
+            xQueueReceive(driveMotorForeverQueue, (void *)&m, 0);
         m.speed = speeds[speed];
         m.motor = motor;
         int ret = xQueueSend(driveMotorForeverQueue, (void *)&m, 0);
@@ -234,11 +240,11 @@ namespace RestApi
 
     void driveMotorXYForever(int speedX, int speedY)
     {
-        log_i("drive XY motor speed x:%i speed y:%i", speedX,speedY);
+        log_i("drive XY motor speed x:%i speed y:%i", speedX, speedY);
         updateMotorXYForever_t o;
-        
-        if(uxQueueMessagesWaiting(driveMotorXYForeverQueue) == QueueElementSize-1)
-            xQueueReceive(driveMotorXYForeverQueue, (void*)&o, 0);
+
+        if (uxQueueMessagesWaiting(driveMotorXYForeverQueue) == QueueElementSize - 1)
+            xQueueReceive(driveMotorXYForeverQueue, (void *)&o, 0);
         o.speedX = speedX;
         o.speedY = speedY;
         int ret = xQueueSend(driveMotorXYForeverQueue, (void *)&o, 0);
@@ -253,7 +259,7 @@ namespace RestApi
             if (updateLedColorQueue != NULL && uxQueueMessagesWaiting(updateLedColorQueue) > 0)
             { // Sanity check just to make sure the queue actually exists
                 update_led_t led;
-                BaseType_t ret = xQueueReceive(updateLedColorQueue, (void*)&led, 0);
+                BaseType_t ret = xQueueReceive(updateLedColorQueue, (void *)&led, 0);
                 if (ret == pdTRUE)
                 {
                     DynamicJsonDocument doc(512);
@@ -304,7 +310,7 @@ namespace RestApi
         websocket_connect();
         if (xHandle != nullptr)
             vTaskDelete(xHandle);
-        xTaskCreate(sendSocketMsg, "sendsocketmsg", 4*1024, NULL, 1, &xHandle);
+        xTaskCreate(sendSocketMsg, "sendsocketmsg", 4 * 1024, NULL, 1, &xHandle);
     }
 
     void init()

@@ -1,8 +1,8 @@
 #include "uc2ui_controller.h"
 #include "uc2ui_wifipage.h"
 #include "Arduino.h"
-#include "uc2ui_controlpage.h"
-#include "uc2ui_motoradvpage.h"
+#include "uc2ui_microscopepage.h"
+#include "lvgl_helper.h"
 
 namespace uc2ui_controller
 {
@@ -11,8 +11,8 @@ namespace uc2ui_controller
     lv_obj_t *ui_MainTabView;
 
     lv_obj_t *wifiPage;
-    lv_obj_t *controlPage;
-    lv_obj_t *motorAdvPage;
+    lv_obj_t *microscopepage;
+
 
     void on_textarea_focus_event(lv_event_t *e)
     {
@@ -46,7 +46,7 @@ namespace uc2ui_controller
         lv_obj_set_flex_flow(mainScreen, LV_FLEX_FLOW_COLUMN);
         lv_obj_set_flex_align(mainScreen, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-        ui_MainTabView = lv_tabview_create(mainScreen, LV_DIR_TOP, 50);
+        ui_MainTabView = lv_tabview_create(mainScreen, LV_DIR_TOP, 40);
         lv_obj_set_width(ui_MainTabView, lv_pct(100));
         lv_obj_set_height(ui_MainTabView, lv_pct(100));
         lv_obj_set_align(ui_MainTabView, LV_ALIGN_CENTER);
@@ -61,13 +61,15 @@ namespace uc2ui_controller
         wifiPage = lv_tabview_add_tab(ui_MainTabView, "Wifi");
         uc2ui_wifipage::init_ui(wifiPage, on_textarea_focus_event);
 
-        controlPage = lv_tabview_add_tab(ui_MainTabView, "Control");
-        uc2ui_controlpage::uiInit(controlPage,on_textarea_focus_event);
-
-        motorAdvPage = lv_tabview_add_tab(ui_MainTabView, "Motor");
-        uc2ui_motoradvpage::initUi(motorAdvPage);
+        microscopepage = lv_tabview_add_tab(ui_MainTabView, "Microscope");
+        uc2ui_microscopepage::initUi(microscopepage);
 
         lv_disp_load_scr(mainScreen);
+    }
+
+    void showMicroscopePage(bool show)
+    {
+        lvgl_helper::setVisibility(microscopepage,show);
     }
 
 }
