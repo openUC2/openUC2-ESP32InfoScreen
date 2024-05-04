@@ -3,9 +3,11 @@
 #include "lvgl_controller.h"
 #include "wifi_controller.h"
 #include "uc2ui_wifipage.h"
+
 #include "RestApi.h"
 #include "uc2ui_ledpage.h"
 #include "uc2ui_motorpage.h"
+#include "uc2ui_laserpage.h"
 
 void setup()
 {
@@ -27,12 +29,12 @@ void setup()
   uc2ui_wifipage::setOnSearchDeviceButtonClickListner(wifi_controller::searchForDevices);
   uc2ui_wifipage::setConnectToHostListner(wifi_controller::connectToDevice);
 
-  uc2ui_controlpage::setColorChangedListner(RestApi::websocket_updateColors);
-  uc2ui_controlpage::setConnectToHostListner(RestApi::connectTo);
-  uc2ui_controlpage::setUpdateMotorSpeedListner(RestApi::driveMotorForever);
-  uc2ui_controlpage::setenableLedListner(RestApi::setLedOn);
-  uc2ui_controlpage::setenableLaserListner(RestApi::setLaserOn);
-  uc2ui_motoradvpage::setDriveXYMotorListner(RestApi::driveMotorXYForever);
+  uc2ui_ledpage::setColorChangedListner(RestApi::websocket_updateColors);
+  uc2ui_laserpage::setLaserValueChangedListener(RestApi::websocket_updateLaserValues);
+  uc2ui_motorpage::setUpdateMotorSpeedListner(RestApi::driveMotorForever);
+  uc2ui_ledpage::setenableLedListner(RestApi::setLedOn);
+  uc2ui_motorpage::setDriveXYMotorListner(RestApi::driveMotorXYForever);
+
 }
 
 void loop()
