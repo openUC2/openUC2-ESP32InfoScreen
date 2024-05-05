@@ -121,7 +121,7 @@ namespace uc2ui_laserpage
         lv_obj_set_x(LabelGreen, 0);
         lv_obj_set_y(LabelGreen, 120);
         lv_obj_set_align(LabelGreen, LV_ALIGN_TOP_MID);
-        lv_label_set_text(LabelGreen, "Green");
+        lv_label_set_text(LabelGreen, "Channel 2");
 
         SliderCh2 = lv_slider_create(laserPanel);
         lv_slider_set_range(SliderCh2, 0, 255);
@@ -145,7 +145,7 @@ namespace uc2ui_laserpage
         lv_obj_set_x(LabelBlue, 0);
         lv_obj_set_y(LabelBlue, 170);
         lv_obj_set_align(LabelBlue, LV_ALIGN_TOP_MID);
-        lv_label_set_text(LabelBlue, "Blue");
+        lv_label_set_text(LabelBlue, "Channel 3");
 
         SliderCh3 = lv_slider_create(laserPanel);
         lv_slider_set_range(SliderCh3, 0, 255);
@@ -177,7 +177,7 @@ namespace uc2ui_laserpage
         lv_obj_set_flex_flow(laserPanel, LV_FLEX_FLOW_COLUMN);
         lv_obj_set_flex_align(laserPanel, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
         lv_obj_clear_flag(laserPanel, LV_OBJ_FLAG_SCROLLABLE);
-        lvgl_helper::setVisibility(laserPanel, false);
+        lvgl_helper::setVisibility(laserPanel, true);
 
         initLaserPanel();
     }
