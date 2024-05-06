@@ -10,18 +10,11 @@ namespace uc2ui_custompage
     lv_obj_t *customPanel;
     lv_obj_t *ButtonCustom[6]; // Array to hold the custom buttons
 
-    void (*updatedValuesListener)(int r, int g, int b);
+    void (*updatedButtonListener)(char *topic, int value);
 
-    void setCustomValueChangedListener(void valueChangedListener(int r, int g, int b))
+    void setCustomValueChangedListener(void valueChangedListener(char *topic, int value))
     {
-        updatedValuesListener = valueChangedListener;
-    }
-
-    void (*enableCustomListner)(bool enable, int r, int g, int b);
-
-    void setenableCustomListner(void customlistner(bool enable, int r, int g, int b))
-    {
-        enableCustomListner = customlistner;
+        updatedButtonListener = valueChangedListener;
     }
 
     void setCustomModule(bool enable)
@@ -52,6 +45,8 @@ namespace uc2ui_custompage
                 {
                     log_i("button target id %d, target %d", ButtonCustom[i], obj);
                     buttonIndex = i;
+                    if (updatedButtonListener != nullptr)
+                        updatedButtonListener("custom", buttonIndex);
                     break;
                 }
             // Do something with the button index

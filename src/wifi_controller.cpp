@@ -49,7 +49,7 @@ namespace wifi_controller
         }
     }
 
-    void searchForDevices()
+    char *searchForDevices()
     {
         mdns_init();
         mdns_result_t *results = NULL;
@@ -57,23 +57,26 @@ namespace wifi_controller
         if (err)
         {
             log_e("Query Failed");
-            return;
+            return NULL;
         }
         if (!results)
         {
             log_w("No results found!");
-            return;
+            return NULL;
         }
+        char *device = "";
         while (results)
         {
             if (results->hostname)
             {
+                device = results->hostname;
                 uc2ui_wifipage::addDeviceToPanel(results->hostname);
                 results = results->next;
             }
         }
         mdns_query_results_free(results);
         mdns_free();
+        return device;
     }
 
     void connectToDevice(char *url)
@@ -106,5 +109,44 @@ namespace wifi_controller
 
         // printf(IPSTR, IP2STR(&address));
         mdns_free();
+    }
+
+    void autoConnect(){
+        // try to connect to the last known network
+        // 1. Search for SSID:UC2_3 @ PW:12345678
+        // 2. list devices and connect to devive 0 
+        // 3. connect to host
+        const char* ssid     = "Uc2";
+        const char* password = "12345678";
+        log_i("Connect to: %s PW:%s", ssid, password);
+        // scan for networks
+        int networkcount = WiFi.scanNetworks();
+        for (int i = 0; i < networkcount; i++)
+        {
+            log_i("Found network %s", WiFi.SSID(i));
+        }
+
+        WiFi.begin(ssid, password);
+        log_i("Connecting to WiFi...");
+
+        int ret = 0;
+        while (WiFi.status() != WL_CONNECTED && ret < 5)
+        {
+            delay(1000);
+            ret++;
+        }
+        WiFi.setAutoReconnect(false);
+        if (ret == 5){
+            WiFi.disconnect();
+            }
+        else{
+            log_i("search for devices");
+            char *mUrl = searchForDevices();
+            if (mUrl != NULL)
+            {
+                log_i("connect to device: %s", mUrl);
+                connectToDevice(mUrl);
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@
 #include "uc2ui_motorpage.h"
 #include "uc2ui_controller.h"
 #include "uc2ui_wifipage.h"
+#include "uc2ui_custompage.h"
 
 namespace RestApi
 {
@@ -21,6 +22,12 @@ namespace RestApi
         int arrtype;
         int ch1, ch2, ch3;
     } update_laser_t;
+
+    typedef struct
+    {
+        char *task;
+        int value;
+    } update_message_t;
 
     typedef struct
     {
@@ -41,6 +48,7 @@ namespace RestApi
     static QueueHandle_t driveMotorForeverQueue;
     static QueueHandle_t driveMotorXYForeverQueue;
     static QueueHandle_t updateLaserValueQueue;
+    static QueueHandle_t updateMessageQueue;
     const int QueueElementSize = 2;
     xTaskHandle xHandle;
 
@@ -94,6 +102,8 @@ namespace RestApi
             uc2ui_ledpage::setLedModule(true);
         if (doc["modules"].containsKey("laser"))
             uc2ui_laserpage::setLaserModule(true);
+        if (doc["modules"].containsKey("custom"))
+            uc2ui_custompage::setCustomModule(true);
         doc.clear();
     }
 
@@ -141,6 +151,19 @@ namespace RestApi
             uc2ui_ledpage::setLedOn(doc["laser_ison"]);
         */
         doc.clear();
+    }
+
+    void getCustom()
+    {
+        DynamicJsonDocument doc(512);
+        sendGetRequest("/custom_get", doc);
+        /*TODO: anything to get here?
+        if (doc["customArrNum"] != NULL)
+            uc2ui_custompage::setCustomCount(doc["customArrNum"]);
+        if (doc["custom_ison"] != NULL)
+            uc2ui_custompage::setCustomOn(doc["custom_ison"]);
+        doc.clear();
+        */
     }
 
     void disconnect()
@@ -233,7 +256,6 @@ namespace RestApi
         doc["led"]["led_array"][0]["g"] = g;
         doc["led"]["led_array"][0]["b"] = b;
         send_websocket_msg(doc);
-        // sendPostRequest("/ledarr_act", doc);
         doc.clear();
     }
 
@@ -248,15 +270,33 @@ namespace RestApi
         int ret = xQueueSend(updateLaserValueQueue, (void *)&laser, 0);
     }
 
+    void websocket_updateButtonValues(char *task, int value)
+    {
+        log_i("websocket_updateButtonValues");
+        update_message_t message;
+        message.task = task;
+        message.value = value;
+        int ret = xQueueSend(updateMessageQueue, (void *)&message, 0);
+    }
+
     void setLaserOn(bool enable, int ch1, int ch2, int ch3)
     {
-        // {"task": "/laser_act", "LASERid":1, "LASERval": 51}
         DynamicJsonDocument doc(512);
         doc["laser"][0]["ch1"] = ch1;
         doc["laser"][0]["ch2"] = ch2;
         doc["laser"][0]["ch3"] = ch3;
         send_websocket_msg(doc);
         // sendPostRequest("/ledarr_act", doc);
+        doc.clear();
+    }
+
+    void sendMessage(String task, int value)
+    {
+        log_i("sendMessage");
+        DynamicJsonDocument doc(512);
+        doc["message"]["task"] = task;
+        doc["message"]["value"] = value;
+        send_websocket_msg(doc);
         doc.clear();
     }
 
@@ -329,10 +369,32 @@ namespace RestApi
                     doc["laser"]["ch1"] = laser.ch1;
                     doc["laser"]["ch2"] = laser.ch2;
                     doc["laser"]["ch3"] = laser.ch3;
+                    // {"task": "/laser_act", "LASERid":1, "LASERval": 51}
+                    for (int iLaser=1; iLaser <4; iLaser ++){
+                        DynamicJsonDocument doc(512);
+                        doc["laser"]["LASERid"] = 1; 
+                        if (iLaser==1) doc["LASERval"]=laser.ch1;
+                        if (iLaser==2) doc["LASERval"]=laser.ch2;
+                        if (iLaser==3) doc["LASERval"]=laser.ch3;
+                        send_websocket_msg(doc);
+                    } 
+                    
+                    doc.clear();
+                }
+            }    
+            if (updateMessageQueue != NULL && uxQueueMessagesWaiting(updateMessageQueue) > 0)
+            { // Sanity check just to make sure the queue actually exists
+                update_message_t message;
+                BaseType_t ret = xQueueReceive(updateMessageQueue, (void *)&message, 0);
+                if (ret == pdTRUE)
+                {
+                    DynamicJsonDocument doc(512);
+                    doc["message"]["task"] = message.task;
+                    doc["message"]["value"] = message.value;
                     send_websocket_msg(doc);
                     doc.clear();
                 }
-            }            
+            }
             if (driveMotorForeverQueue != NULL && uxQueueMessagesWaiting(driveMotorForeverQueue) > 0)
             { // Sanity check just to make sure the queue actually exists
                 updateMotorForever_t m;
@@ -379,16 +441,19 @@ namespace RestApi
     {
         updateLedColorQueue = xQueueCreate(QueueElementSize, sizeof(update_led_t));
         if (updateLedColorQueue == 0)
-            log_e("Failes to create json queue");
+            log_e("Failed to create json queue");
         updateLaserValueQueue = xQueueCreate(QueueElementSize, sizeof(update_laser_t));
         if (updateLaserValueQueue == 0)
             log_e("failed to crete json queue (laser)");
+        updateMessageQueue = xQueueCreate(QueueElementSize, sizeof(update_message_t));
+        if (updateMessageQueue == 0)
+            log_e("Failed to create json queue");
         driveMotorForeverQueue = xQueueCreate(QueueElementSize, sizeof(updateMotorForever_t));
         if (driveMotorForeverQueue == 0)
-            log_e("Failes to create json queue");
+            log_e("Failed to create json queue");
         driveMotorXYForeverQueue = xQueueCreate(QueueElementSize, sizeof(updateMotorXYForever_t));
         if (driveMotorXYForeverQueue == 0)
-            log_e("Failes to create json queue");
+            log_e("Failed to create json queue");
     }
 
 }

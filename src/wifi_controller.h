@@ -14,6 +14,7 @@ namespace wifi_controller
     void scanForNetworks();
     void connectToNetwork(char * ssid,const char * pw);
     void loop();
-    void searchForDevices();
+    char* searchForDevices();
     void connectToDevice(char* url);
+    void autoConnect();
 }; // namespace wifi_controller

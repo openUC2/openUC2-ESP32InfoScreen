@@ -8,9 +8,11 @@
 #include "uc2ui_ledpage.h"
 #include "uc2ui_motorpage.h"
 #include "uc2ui_laserpage.h"
+#include "uc2ui_custompage.h"
 
 void setup()
 {
+
   Serial.begin(115200); /* prepare for possible serial debug */
   Serial.setTimeout(50);
   Serial.println("");
@@ -26,11 +28,14 @@ void setup()
 
   uc2ui_wifipage::setOnScanButtonClickListner(wifi_controller::scanForNetworks);
   uc2ui_wifipage::setOnWifiConnectButtonClickListner(wifi_controller::connectToNetwork);
-  uc2ui_wifipage::setOnSearchDeviceButtonClickListner(wifi_controller::searchForDevices);
+  uc2ui_wifipage::setOnSearchDeviceButtonClickListner([]() {wifi_controller::searchForDevices();});
   uc2ui_wifipage::setConnectToHostListner(wifi_controller::connectToDevice);
 
+  // autoconnect 
+  wifi_controller::autoConnect();
   uc2ui_ledpage::setColorChangedListner(RestApi::websocket_updateColors);
   uc2ui_laserpage::setLaserValueChangedListener(RestApi::websocket_updateLaserValues);
+  uc2ui_custompage::setCustomValueChangedListener(RestApi::websocket_updateButtonValues);
   uc2ui_motorpage::setUpdateMotorSpeedListner(RestApi::driveMotorForever);
   uc2ui_ledpage::setenableLedListner(RestApi::setLedOn);
   uc2ui_motorpage::setDriveXYMotorListner(RestApi::driveMotorXYForever);

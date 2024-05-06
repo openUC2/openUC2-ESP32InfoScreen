@@ -193,6 +193,11 @@ namespace uc2ui_wifipage
         lv_obj_set_height(devicesButtonLabel, LV_SIZE_CONTENT); /// 1
         lv_obj_set_align(devicesButtonLabel, LV_ALIGN_CENTER);
         lv_label_set_text(devicesButtonLabel, "Search Devices");
+
+        // try to connect to the last known network
+        // 1. Search for SSID:UC2_3 @ PW:12345678
+        // 2. list devices and connect to devive 0 
+        // 3. connect to host
     }
 
     void clearNetworks()
