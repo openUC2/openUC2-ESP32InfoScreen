@@ -7,7 +7,7 @@
 #include "uc2ui_motorpage.h"
 #include "uc2ui_controller.h"
 #include "uc2ui_wifipage.h"
-#include "uc2ui_custompage.h"
+#include "uc2ui_messagepage.h"
 
 namespace RestApi
 {
@@ -25,7 +25,7 @@ namespace RestApi
 
     typedef struct
     {
-        char *task;
+        char *key;
         int value;
     } update_message_t;
 
@@ -102,8 +102,8 @@ namespace RestApi
             uc2ui_ledpage::setLedModule(true);
         if (doc["modules"].containsKey("laser"))
             uc2ui_laserpage::setLaserModule(true);
-        if (doc["modules"].containsKey("custom"))
-            uc2ui_custompage::setCustomModule(true);
+        if (doc["modules"].containsKey("message"))
+            uc2ui_messagepage::setMessageModule(true);
         doc.clear();
     }
 
@@ -153,15 +153,15 @@ namespace RestApi
         doc.clear();
     }
 
-    void getCustom()
+    void getMessage()
     {
         DynamicJsonDocument doc(512);
-        sendGetRequest("/custom_get", doc);
+        sendGetRequest("/message_get", doc);
         /*TODO: anything to get here?
-        if (doc["customArrNum"] != NULL)
-            uc2ui_custompage::setCustomCount(doc["customArrNum"]);
-        if (doc["custom_ison"] != NULL)
-            uc2ui_custompage::setCustomOn(doc["custom_ison"]);
+        if (doc["messageArrNum"] != NULL)
+            uc2ui_messagepage::setMessageCount(doc["messageArrNum"]);
+        if (doc["message_ison"] != NULL)
+            uc2ui_messagepage::setMessageOn(doc["message_ison"]);
         doc.clear();
         */
     }
@@ -270,11 +270,11 @@ namespace RestApi
         int ret = xQueueSend(updateLaserValueQueue, (void *)&laser, 0);
     }
 
-    void websocket_updateButtonValues(char *task, int value)
+    void websocket_updateButtonValues(char *key, int value)
     {
-        log_i("websocket_updateButtonValues");
+        log_i("websocket_updateButtonValues: %s, %i", key, value);
         update_message_t message;
-        message.task = task;
+        message.key = key;
         message.value = value;
         int ret = xQueueSend(updateMessageQueue, (void *)&message, 0);
     }
@@ -389,7 +389,7 @@ namespace RestApi
                 if (ret == pdTRUE)
                 {
                     DynamicJsonDocument doc(512);
-                    doc["message"]["task"] = message.task;
+                    doc["message"]["key"] = message.key;
                     doc["message"]["value"] = message.value;
                     send_websocket_msg(doc);
                     doc.clear();

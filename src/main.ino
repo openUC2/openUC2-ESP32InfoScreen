@@ -8,7 +8,7 @@
 #include "uc2ui_ledpage.h"
 #include "uc2ui_motorpage.h"
 #include "uc2ui_laserpage.h"
-#include "uc2ui_custompage.h"
+#include "uc2ui_messagepage.h"
 
 void setup()
 {
@@ -35,7 +35,7 @@ void setup()
   wifi_controller::autoConnect();
   uc2ui_ledpage::setColorChangedListner(RestApi::websocket_updateColors);
   uc2ui_laserpage::setLaserValueChangedListener(RestApi::websocket_updateLaserValues);
-  uc2ui_custompage::setCustomValueChangedListener(RestApi::websocket_updateButtonValues);
+  uc2ui_messagepage::setMessageValueChangedListener(RestApi::websocket_updateButtonValues);
   uc2ui_motorpage::setUpdateMotorSpeedListner(RestApi::driveMotorForever);
   uc2ui_ledpage::setenableLedListner(RestApi::setLedOn);
   uc2ui_motorpage::setDriveXYMotorListner(RestApi::driveMotorXYForever);

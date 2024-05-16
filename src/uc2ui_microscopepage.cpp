@@ -2,7 +2,7 @@
 #include "uc2ui_motorpage.h"
 #include "uc2ui_ledpage.h"
 #include "uc2ui_laserpage.h"
-#include "uc2ui_custompage.h"
+#include "uc2ui_messagepage.h"
 
 namespace uc2ui_microscopepage
 {
@@ -10,7 +10,7 @@ namespace uc2ui_microscopepage
     lv_obj_t * motorpage;
     lv_obj_t * ledpage;
     lv_obj_t * laserpage;
-    lv_obj_t * custompage;
+    lv_obj_t * messagepage;
     lv_obj_t * settingspage;
 
     void initUi(lv_obj_t *motoradvpage)
@@ -33,8 +33,8 @@ namespace uc2ui_microscopepage
         laserpage = lv_tabview_add_tab(tabViewMicroscopeControl, "Laser");
         uc2ui_laserpage::initUI(laserpage);
 
-        custompage = lv_tabview_add_tab(tabViewMicroscopeControl, "Custom");
-        uc2ui_custompage::initUI(custompage);
+        messagepage = lv_tabview_add_tab(tabViewMicroscopeControl, "Message");
+        uc2ui_messagepage::initUI(messagepage);
 
     }
 }

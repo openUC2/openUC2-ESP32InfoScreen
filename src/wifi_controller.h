@@ -16,5 +16,5 @@ namespace wifi_controller
     void loop();
     char* searchForDevices();
     void connectToDevice(char* url);
-    void autoConnect();
+    bool autoConnect();
 }; // namespace wifi_controller

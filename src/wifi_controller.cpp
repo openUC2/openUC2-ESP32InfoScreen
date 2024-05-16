@@ -21,6 +21,10 @@ namespace wifi_controller
 
     void connectToNetwork(char *ssid, const char *pw)
     {
+        
+        // try to connect to the device with presets
+        if (autoConnect()) return;
+
         log_i("Connect to: %s PW:%s", ssid, pw);
         uc2ui_wifipage::updatedWifiLed(14);
         WiFi.begin(ssid, pw);
@@ -28,10 +32,10 @@ namespace wifi_controller
         int ret = 0;
         while (WiFi.status() != WL_CONNECTED && ret < 5)
         {
-            delay(1000);
+            delay(500);
             ret++;
         }
-        WiFi.setAutoReconnect(false);
+        WiFi.setAutoReconnect(true);
         if (ret == 5)
             WiFi.disconnect();
     }
@@ -111,7 +115,7 @@ namespace wifi_controller
         mdns_free();
     }
 
-    void autoConnect(){
+    bool autoConnect(){
         // try to connect to the last known network
         // 1. Search for SSID:UC2_3 @ PW:12345678
         // 2. list devices and connect to devive 0 
@@ -119,25 +123,24 @@ namespace wifi_controller
         const char* ssid     = "Uc2";
         const char* password = "12345678";
         log_i("Connect to: %s PW:%s", ssid, password);
-        // scan for networks
-        int networkcount = WiFi.scanNetworks();
-        for (int i = 0; i < networkcount; i++)
-        {
-            log_i("Found network %s", WiFi.SSID(i));
-        }
-
+        
+        // Try to connect to the device
         WiFi.begin(ssid, password);
-        log_i("Connecting to WiFi...");
-
+        
         int ret = 0;
         while (WiFi.status() != WL_CONNECTED && ret < 5)
         {
-            delay(1000);
+            delay(500);
             ret++;
         }
-        WiFi.setAutoReconnect(false);
+        WiFi.setAutoReconnect(true);
+
+        // if not succesful, disconnect and display Wifi networks on GUI
         if (ret == 5){
+            log_i("Disocnnect Wifi");
             WiFi.disconnect();
+            uc2ui_wifipage::updatedWifiLed(0); // red
+            return false;
             }
         else{
             log_i("search for devices");
@@ -146,7 +149,9 @@ namespace wifi_controller
             {
                 log_i("connect to device: %s", mUrl);
                 connectToDevice(mUrl);
+                uc2ui_wifipage::updatedWifiLed(9); // green
             }
+            return true;
         }
     }
 }
