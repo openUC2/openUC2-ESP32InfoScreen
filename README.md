@@ -4,7 +4,7 @@ This repository contains code for an ESP32-S3 based display designed to control 
 
 ## Showcase 
 
-![](./IMAGES/ESP32Info.jpg)
+![](./ESP32Info.jpg)
 
 ## Table of Contents
 - [Introduction](#introduction)
