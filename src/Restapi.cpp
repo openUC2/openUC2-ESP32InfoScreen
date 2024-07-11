@@ -182,6 +182,7 @@ namespace RestApi
             log_i("[WSc] Disconnected!\n");
             socketConnected = false;
             disconnect();
+            ESP.restart(); // TODO: restart makes sense?
             break;
         case WStype_CONNECTED:
             log_i("[WSc] Connected to url: %s\n", payload);
